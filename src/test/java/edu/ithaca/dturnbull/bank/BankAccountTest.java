@@ -29,15 +29,18 @@ class BankAccountTest {
     void isEmailValidTest(){
         assertTrue(BankAccount.isEmailValid( "a@b.com"));   // valid email address
         assertFalse(BankAccount.isEmailValid(""));          // empty string
-        assertFalse(BankAccount.isEmailValid("a@b"));
-        assertFalse(BankAccount.isEmailValid("a.b.com"));
-        assertFalse(BankAccount.isEmailValid("@b.com"));
-        assertFalse(BankAccount.isEmailValid("a@.com"));
-        assertFalse(BankAccount.isEmailValid("a@b."));
-        assertFalse(BankAccount.isEmailValid("a"));
-        assertFalse(BankAccount.isEmailValid("@"));
-        assertFalse(BankAccount.isEmailValid("a@b..com"));
-        assertFalse(BankAccount.isEmailValid("a..b@c.com"));
+        assertFalse(BankAccount.isEmailValid("a@b"));       // equivalence class: bad domain - no tld
+        assertFalse(BankAccount.isEmailValid("a.b.com"));   // equivalence class: bad structure - no @
+        assertFalse(BankAccount.isEmailValid("@b.com"));    // equivalence class: bad structure - missing local part / border case
+        assertFalse(BankAccount.isEmailValid("a@.com"));    // equivalence class: bad structure - missing domain / border case
+        assertFalse(BankAccount.isEmailValid("a@b."));      // equivalence class: bad domain - zero char tld / border case
+        assertFalse(BankAccount.isEmailValid("a"));         // equivalence class: bad structure - single char / border case
+        assertFalse(BankAccount.isEmailValid("@"));         // equivalence class: bad structure - zero char local and domain / border case
+        assertFalse(BankAccount.isEmailValid("a@b..com"));  // equivalence class: bad domain - double dot
+        assertFalse(BankAccount.isEmailValid("a..b@c.com"));// equivalence class: bad local part - double dot
+
+        // missing equivalence classes: checks for special/invalid characters, numbers, extra @ symbols
+        // missing border cases: either part ending/starting with dot, max-lengths
     }
 
     @Test
