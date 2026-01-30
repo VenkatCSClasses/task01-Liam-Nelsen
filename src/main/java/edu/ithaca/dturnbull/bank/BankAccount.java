@@ -40,11 +40,12 @@ public class BankAccount {
 
 
     public static boolean isEmailValid(String email){
-        if (email.indexOf('@') == -1){
+        if (email.length() < 4){
             return false;
         }
-        else {
-            return true;
-        }
+
+        String emailRegex = "^([\\w+'!#%&*=/-]+(?:\\.[\\w+'!#%&*=/-]+)*)@((?:[\\w-]+\\.)*\\w[\\w-]{0,66})\\.([a-z]{2,})$";
+        
+        return email.matches(emailRegex);
     }
 }
