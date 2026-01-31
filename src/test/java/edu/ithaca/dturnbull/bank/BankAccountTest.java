@@ -17,12 +17,125 @@ class BankAccountTest {
     }
 
     @Test
-    void withdrawTest() throws InsufficientFundsException{  
-        BankAccount bankAccount = new BankAccount("a@b.com", 200);
-        bankAccount.withdraw(100);
+    void withdrawTestEquivalenceClasses() throws InsufficientFundsException {
 
-        assertEquals(100, bankAccount.getBalance(), 0.001);
-        assertThrows(InsufficientFundsException.class, () -> bankAccount.withdraw(300));
+        BankAccount bankAccount1 = new BankAccount("a@b.com", 200);
+        assertEquals(200, bankAccount1.getBalance(), 0.001);
+
+        //Equivalence class: Valid withdrawals (0 <= amount <= balance)
+
+        // At boundary: withdraw full balance
+        BankAccount bankAccount2 = new BankAccount("a@b.com", 200);
+        bankAccount2.withdraw(200);
+        assertEquals(0, bankAccount2.getBalance(), 0.001);
+
+        // Above boundary: just under full balance
+        BankAccount bankAccount3 = new BankAccount("a@b.com", 200);
+        bankAccount3.withdraw(199.99);
+        assertEquals(0.01, bankAccount3.getBalance(), 0.001);
+
+        // Middle of valid class
+        BankAccount bankAccount4 = new BankAccount("a@b.com", 200);
+        bankAccount4.withdraw(100);
+        assertEquals(100, bankAccount4.getBalance(), 0.001);
+
+
+
+
+        //Equivalence class: Invalid: amount must be >= 0
+
+        // Below boundary: negative amount
+        BankAccount bankAccount5 = new BankAccount("a@b.com", 200);
+        assertThrows(IllegalArgumentException.class, () -> bankAccount5.withdraw(-1));
+
+        // At boundary: zero 
+        BankAccount bankAccount6 = new BankAccount("a@b.com", 200);
+        bankAccount6.withdraw(0);
+        assertEquals(200, bankAccount6.getBalance(), 0.001);
+
+        // Above boundary: smallest valid positive amount
+        BankAccount bankAccount7 = new BankAccount("a@b.com", 200);
+        bankAccount7.withdraw(0.01);
+        assertEquals(199.99, bankAccount7.getBalance(), 0.001);
+
+
+
+
+        //Equivalence class: Invalid: insufficient funds (amount > balance)
+
+        // Below boundary: just over balance
+        BankAccount bankAccount8 = new BankAccount("a@b.com", 200);
+        assertThrows(InsufficientFundsException.class, () -> bankAccount8.withdraw(200.01));
+
+        // At boundary: equal to balance (valid)
+        BankAccount bankAccount9 = new BankAccount("a@b.com", 200);
+        bankAccount9.withdraw(200);
+        assertEquals(0, bankAccount9.getBalance(), 0.001);
+
+        // Above boundary: middle of invalid class
+        BankAccount bankAccount10 = new BankAccount("a@b.com", 200);
+        assertThrows(InsufficientFundsException.class, () -> bankAccount10.withdraw(500));
+
+
+ 
+
+        //Equivalence class: Multiple withdrawals (state-based equivalence class)
+
+        // Middle of boundary: multiple valid withdrawals
+        BankAccount bankAccount14 = new BankAccount("a@b.com", 200);
+        bankAccount14.withdraw(50);
+        bankAccount14.withdraw(50);
+        assertEquals(100, bankAccount14.getBalance(), 0.001);
+
+        // At boundary: withdraw remaining balance after previous withdrawals
+        BankAccount bankAccount15 = new BankAccount("a@b.com", 200);
+        bankAccount15.withdraw(150);
+        bankAccount15.withdraw(50);
+        assertEquals(0, bankAccount15.getBalance(), 0.001);
+
+        // Below boundary: attempt to withdraw after balance is zero
+        BankAccount bankAccount16 = new BankAccount("a@b.com", 200);
+        bankAccount16.withdraw(200);
+        assertThrows(InsufficientFundsException.class, () -> bankAccount16.withdraw(1));
+
+
+
+
+        //Equivalence class: Very small float withdrawals
+
+        // Below boundary: too small to matter (treated as valid)
+        BankAccount bankAccount17 = new BankAccount("a@b.com", 200);
+        bankAccount17.withdraw(0.0001);
+        assertEquals(199.9999, bankAccount17.getBalance(), 0.001);
+
+        // At boundary: smallest representable positive double
+        BankAccount bankAccount18 = new BankAccount("a@b.com", 200);
+        bankAccount18.withdraw(Double.MIN_VALUE);
+        assertEquals(200 - Double.MIN_VALUE, bankAccount18.getBalance(), 0.001);
+
+        // Above boundary: small but normal amount
+        BankAccount bankAccount19 = new BankAccount("a@b.com", 200);
+        bankAccount19.withdraw(0.5);
+        assertEquals(199.5, bankAccount19.getBalance(), 0.001);
+
+
+
+
+        //Equivalence class: Very large withdrawals (within balance)
+
+        // Middle: large valid withdrawal
+        BankAccount bankAccount20 = new BankAccount("a@b.com", 1_000_000);
+        bankAccount20.withdraw(500_000);
+        assertEquals(500_000, bankAccount20.getBalance(), 0.001);
+
+        // At boundary: withdraw entire large balance
+        BankAccount bankAccount21 = new BankAccount("a@b.com", 1_000_000);
+        bankAccount21.withdraw(1_000_000);
+        assertEquals(0, bankAccount21.getBalance(), 0.001);
+
+        // Above boundary: slightly more than balance
+        BankAccount bankAccount22 = new BankAccount("a@b.com", 1_000_000);
+        assertThrows(InsufficientFundsException.class, () -> bankAccount22.withdraw(1_000_001));
     }
 
     @Test
@@ -72,7 +185,7 @@ class BankAccountTest {
 
 
         // Equivalence class: dot placement in domain
-        assertFalse(BankAccount.isEmailValid("a@.com")); //below boundary (domain starts with dot)
+        assertFalse(BankAccount.isEmailValid("a@.com")); //below boundary (domain starts with dot)777   
         assertTrue(BankAccount.isEmailValid("a@b.cd")); //above boundary
         assertTrue(BankAccount.isEmailValid("a@example.com")); //middle of boundary
 
