@@ -30,14 +30,18 @@ public class BankAccount {
      * @post reduces the balance by amount if amount is non-negative and smaller than balance
      * @throws InsufficientFundsException if amount is greater than balance
      */
-    public void withdraw (double amount) throws InsufficientFundsException{
-        if (amount <= balance){
-            balance -= amount;
-        }
-        else {
-            throw new InsufficientFundsException("Not enough money");
-        }
+    public void withdraw(double amount) throws InsufficientFundsException {
+
+    if (amount < 0 || Double.isNaN(amount) || Double.isInfinite(amount)) {
+        throw new IllegalArgumentException("Invalid withdrawal amount");
     }
+
+    if (amount > balance) {
+        throw new InsufficientFundsException("Not enough money");
+    }
+
+    balance -= amount;
+}
 
 
     public static boolean isEmailValid(String email){

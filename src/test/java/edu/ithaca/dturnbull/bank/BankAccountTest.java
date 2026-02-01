@@ -10,11 +10,105 @@ import org.junit.jupiter.api.Test;
 class BankAccountTest {
 
     @Test
-    void getBalanceTest() {
-        BankAccount bankAccount = new BankAccount("a@b.com", 200);
+    void getBalanceTest() throws InsufficientFundsException {
 
-        assertEquals(200, bankAccount.getBalance(), 0.001);
+        //Equivalence class: initial balance
+
+        // Below boundary: zero balance
+        BankAccount bankAccount1 = new BankAccount("a@b.com", 0);
+        assertEquals(0, bankAccount1.getBalance(), 0.001);
+
+        // At boundary: small balance
+        BankAccount bankAccount2 = new BankAccount("a@b.com", 0.01);
+        assertEquals(0.01, bankAccount2.getBalance(), 0.001);
+
+        // Above boundary: normal balance
+        BankAccount bankAccount3 = new BankAccount("a@b.com", 200);
+        assertEquals(200, bankAccount3.getBalance(), 0.001);
+
+        // Middle of class: large balance
+        BankAccount bankAccount4 = new BankAccount("a@b.com", 1000000);
+        assertEquals(1000000, bankAccount4.getBalance(), 0.001);
+
+
+
+
+        //Equivalence class: balance after valid withdrawals
+
+        // Below boundary: withdraw small amount
+        BankAccount bankAccount5 = new BankAccount("a@b.com", 200);
+        bankAccount5.withdraw(0.01);
+        assertEquals(199.99, bankAccount5.getBalance(), 0.001);
+
+        // At boundary: withdraw full balance
+        BankAccount bankAccount6 = new BankAccount("a@b.com", 200);
+        bankAccount6.withdraw(200);
+        assertEquals(0, bankAccount6.getBalance(), 0.001);
+
+        // Above boundary: withdraw just under full balance
+        BankAccount bankAccount7 = new BankAccount("a@b.com", 200);
+        bankAccount7.withdraw(199.99);
+        assertEquals(0.01, bankAccount7.getBalance(), 0.001);
+
+        // Middle of class: multiple withdrawals
+        BankAccount bankAccount8 = new BankAccount("a@b.com", 200);
+        bankAccount8.withdraw(50);
+        bankAccount8.withdraw(50);
+        assertEquals(100, bankAccount8.getBalance(), 0.001);
+
+
+
+ 
+        //Equivalence class: balance unchanged after invalid withdrawals
+
+        // Below boundary: negative withdrawal
+        BankAccount bankAccount9 = new BankAccount("a@b.com", 200);
+        assertThrows(IllegalArgumentException.class, () -> bankAccount9.withdraw(-1));
+        assertEquals(200, bankAccount9.getBalance(), 0.001);
+
+        // At boundary: zero withdrawal
+        BankAccount bankAccount10 = new BankAccount("a@b.com", 200);
+        bankAccount10.withdraw(0);
+        assertEquals(200, bankAccount10.getBalance(), 0.001);
+
+        // Above boundary: insufficient funds
+        BankAccount bankAccount11 = new BankAccount("a@b.com", 200);
+        assertThrows(InsufficientFundsException.class, () -> bankAccount11.withdraw(201));
+        assertEquals(200, bankAccount11.getBalance(), 0.001);
+
+
+
+
+        //Equivalence class: withdrawals with small float's
+
+        // Below boundary: small withdrawal
+        BankAccount bankAccount12 = new BankAccount("a@b.com", 200);
+        bankAccount12.withdraw(0.0001);
+        assertEquals(199.9999, bankAccount12.getBalance(), 0.001);
+
+        // Above boundary: normal partial withdrawal
+        BankAccount bankAccount14 = new BankAccount("a@b.com", 200);
+        bankAccount14.withdraw(0.5);
+        assertEquals(199.5, bankAccount14.getBalance(), 0.001);
+
+
+
+
+        //Equivalence class: extreme balances
+
+        // Below boundary: withdraw very small balance
+        BankAccount bankAccount15 = new BankAccount("a@b.com", Double.MIN_VALUE);
+        assertEquals(Double.MIN_VALUE, bankAccount15.getBalance(), 0.001);
+
+        // At boundary: withdraw very large balance
+        BankAccount bankAccount16 = new BankAccount("a@b.com", Double.MAX_VALUE);
+        assertEquals(Double.MAX_VALUE, bankAccount16.getBalance(), 0.001);
+
+        // Middle of class: large, normal balance
+        BankAccount bankAccount17 = new BankAccount("a@b.com", 1000000000);
+        assertEquals(1000000000, bankAccount17.getBalance(), 0.001);
     }
+
 
     @Test
     void withdrawTestEquivalenceClasses() throws InsufficientFundsException {
