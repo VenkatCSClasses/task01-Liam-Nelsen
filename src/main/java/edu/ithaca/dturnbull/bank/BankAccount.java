@@ -52,4 +52,14 @@ public class BankAccount {
         
         return email.matches(emailRegex);
     }
+
+
+    /**
+     * Returns true if the amount is non-negative and has at most two decimal places.
+     * Returns false otherwise.
+     */
+    public static boolean isAmountValid(double amount) {
+
+        return false;
+    }
 }
