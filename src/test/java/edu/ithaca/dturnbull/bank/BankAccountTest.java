@@ -313,4 +313,37 @@ class BankAccountTest {
         assertThrows(IllegalArgumentException.class, ()-> new BankAccount("", 100));
     }
 
+
+    @Test
+    void isAmountValidBoundaryTest() {
+
+        //Equivalence class: valid/invalid amounts (Boundary at 0)
+        assertFalse(BankAccount.isAmountValid(-0.01));   // below boundary
+        assertTrue(BankAccount.isAmountValid(0.00));     // at boundary
+        assertTrue(BankAccount.isAmountValid(0.01));     // above boundary
+
+
+        //Equivalence class: decimal accuracy
+        assertTrue(BankAccount.isAmountValid(1.10));     // at boundary
+        assertFalse(BankAccount.isAmountValid(1.001));   // below boundary
+        assertTrue(BankAccount.isAmountValid(1.1));     // above boundary
+
+
+        //Equivalence class: testing valid amounts
+        assertTrue(BankAccount.isAmountValid(5));
+        assertTrue(BankAccount.isAmountValid(5.1));
+        assertTrue(BankAccount.isAmountValid(5.12));
+
+
+        //Equivalence class: 0 amount
+        assertTrue(BankAccount.isAmountValid(0));        // at boundary
+        assertFalse(BankAccount.isAmountValid(-0.0001)); // below boundary
+        assertTrue(BankAccount.isAmountValid(0.01));     // above boundary
+
+
+        //Equivalence class: testing large amounts
+        assertTrue(BankAccount.isAmountValid(999999.99)); //at boundary
+        assertFalse(BankAccount.isAmountValid(999999.999)); // above boundary (too many decimals)
+    }
+
 }
