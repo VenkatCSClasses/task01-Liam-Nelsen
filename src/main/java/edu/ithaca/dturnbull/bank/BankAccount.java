@@ -60,7 +60,17 @@ public class BankAccount {
      */
     public static boolean isAmountValid(double amount) {
 
-        return false;
+        if (amount < 0 || Double.isNaN(amount) || Double.isInfinite(amount)) {
+            return false;
+        }
+
+        double cents = Math.round(amount * 100);
+
+        if (Math.abs(cents - amount * 100) > 0.0000001) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -69,8 +79,18 @@ public class BankAccount {
      * @throws IllegalArgumentException if the amount is invalid
      */
     public void deposit(double amount) {
-        
+
+    if (amount < 0 || Double.isNaN(amount) || Double.isInfinite(amount)) {
+        throw new IllegalArgumentException("Invalid deposit amount");
     }
+
+    double cents = amount * 100;
+    if (cents != Math.floor(cents)) {
+        throw new IllegalArgumentException("Invalid deposit amount");
+    }
+
+    balance += amount;
+}
 
     /**
      * Transfers the given amount from this bank account to the specified destination account.
@@ -80,6 +100,25 @@ public class BankAccount {
      * @throws InsufficientFundsException: if this account does not have enough balance
      */
     public void transfer(double amount, BankAccount destination) throws InsufficientFundsException {
-        
+
+    if (destination == null) {
+        throw new IllegalArgumentException("Destination account cannot be null");
     }
+
+    if (amount < 0 || Double.isNaN(amount) || Double.isInfinite(amount)) {
+        throw new IllegalArgumentException("Invalid transfer amount");
+    }
+
+    double cents = amount * 100;
+    if (cents != Math.floor(cents)) {
+        throw new IllegalArgumentException("Invalid transfer amount");
+    }
+
+    if (amount > balance) {
+        throw new InsufficientFundsException("Not enough money");
+    }
+
+    this.balance -= amount;
+    destination.balance += amount;
+}
 }

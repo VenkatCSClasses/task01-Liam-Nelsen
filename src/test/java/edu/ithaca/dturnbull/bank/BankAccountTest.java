@@ -325,7 +325,7 @@ class BankAccountTest {
 
 
     @Test
-    void isAmountValidBoundaryTest() {
+    void isAmountValidTest() {
 
         //Equivalence class: valid/invalid amounts (Boundary at 0)
         assertFalse(BankAccount.isAmountValid(-0.01));   // below boundary
