@@ -62,4 +62,24 @@ public class BankAccount {
 
         return false;
     }
+
+    /**
+     * Deposits the given amount into this bank account.
+     * @param amount: amount of money to deposit
+     * @throws IllegalArgumentException if the amount is invalid
+     */
+    public void deposit(double amount) {
+        
+    }
+
+    /**
+     * Transfers the given amount from this bank account to the specified destination account.
+     * @param amount: amount of money to transfer
+     * @param destination: the account to receive the funds
+     * @throws IllegalArgumentException: if the amount is invalid or destination is null
+     * @throws InsufficientFundsException: if this account does not have enough balance
+     */
+    public void transfer(double amount, BankAccount destination) throws InsufficientFundsException {
+        
+    }
 }
