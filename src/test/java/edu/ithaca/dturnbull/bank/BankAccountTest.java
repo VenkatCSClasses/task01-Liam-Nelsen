@@ -111,7 +111,7 @@ class BankAccountTest {
 
 
     @Test
-    void withdrawTestEquivalenceClasses() throws InsufficientFundsException {
+    void withdrawTest() throws InsufficientFundsException {
 
         BankAccount bankAccount1 = new BankAccount("a@b.com", 200);
         assertEquals(200, bankAccount1.getBalance(), 0.001);
@@ -230,6 +230,12 @@ class BankAccountTest {
         // Above boundary: slightly more than balance
         BankAccount bankAccount22 = new BankAccount("a@b.com", 1_000_000);
         assertThrows(InsufficientFundsException.class, () -> bankAccount22.withdraw(1_000_001));
+        
+        BankAccount negTest = new BankAccount("a@b.com", 200);
+        assertThrows(IllegalArgumentException.class, () -> negTest.withdraw(-5));
+
+        BankAccount decimalTest = new BankAccount("a@b.com", 200);
+        assertThrows(IllegalArgumentException.class, () -> decimalTest.withdraw(1.234));
     }
 
     @Test
@@ -311,6 +317,10 @@ class BankAccountTest {
         assertEquals(200, bankAccount.getBalance(), 0.001);
         //check for exception thrown correctly
         assertThrows(IllegalArgumentException.class, ()-> new BankAccount("", 100));
+
+        assertThrows(IllegalArgumentException.class, () -> new BankAccount("a@b.com", -1));
+
+        assertThrows(IllegalArgumentException.class, () -> new BankAccount("a@b.com", 1.234));
     }
 
 
