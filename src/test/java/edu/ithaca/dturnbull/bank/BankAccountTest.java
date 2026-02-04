@@ -230,7 +230,7 @@ class BankAccountTest {
         // Above boundary: slightly more than balance
         BankAccount bankAccount22 = new BankAccount("a@b.com", 1_000_000);
         assertThrows(InsufficientFundsException.class, () -> bankAccount22.withdraw(1_000_001));
-        
+
         BankAccount negTest = new BankAccount("a@b.com", 200);
         assertThrows(IllegalArgumentException.class, () -> negTest.withdraw(-5));
 
@@ -352,8 +352,100 @@ class BankAccountTest {
 
 
         //Equivalence class: testing large amounts
-        assertTrue(BankAccount.isAmountValid(999999.99)); //at boundary
+        assertTrue(BankAccount.isAmountValid(999999.99)); // at boundary
         assertFalse(BankAccount.isAmountValid(999999.999)); // above boundary (too many decimals)
+    }
+
+    @Test
+    void depositTest() {
+
+        //Equivalence class: negative amounts
+        BankAccount acc1 = new BankAccount("a@b.com", 100);
+        assertThrows(IllegalArgumentException.class, () -> acc1.deposit(-1));
+        assertThrows(IllegalArgumentException.class, () -> acc1.deposit(-0.01));
+
+
+        //Equivalence class: more than 2 decimal places
+        BankAccount acc2 = new BankAccount("a@b.com", 100);
+        assertThrows(IllegalArgumentException.class, () -> acc2.deposit(1.234));
+        assertThrows(IllegalArgumentException.class, () -> acc2.deposit(0.009));
+
+
+        //Equivalence class: valid decimal places
+        BankAccount acc3 = new BankAccount("a@b.com", 100);
+        acc3.deposit(50);
+        assertEquals(150, acc3.getBalance(), 0.001);
+
+        BankAccount acc4 = new BankAccount("a@b.com", 100);
+        acc4.deposit(0.1);
+        assertEquals(100.10, acc4.getBalance(), 0.001);
+
+        BankAccount acc5 = new BankAccount("a@b.com", 100);
+        acc5.deposit(99.99);
+        assertEquals(199.99, acc5.getBalance(), 0.001);
+
+
+        //Equivalence class: no deposit
+        BankAccount acc6 = new BankAccount("a@b.com", 100);
+        acc6.deposit(0); 
+        assertEquals(100, acc6.getBalance(), 0.001);
+    }
+
+    @Test
+    void transferTest() throws InsufficientFundsException {
+
+        //Equivalence class: negative amounts
+        BankAccount src1 = new BankAccount("a@b.com", 200);
+        BankAccount dst1 = new BankAccount("c@d.com", 100);
+        assertThrows(IllegalArgumentException.class, () -> src1.transfer(-1, dst1));
+        assertThrows(IllegalArgumentException.class, () -> src1.transfer(-0.01, dst1));
+
+        //Equivalence class: invalid decimal places
+        BankAccount src2 = new BankAccount("a@b.com", 200);
+        BankAccount dst2 = new BankAccount("c@d.com", 100);
+        assertThrows(IllegalArgumentException.class, () -> src2.transfer(1.234, dst2));
+        assertThrows(IllegalArgumentException.class, () -> src2.transfer(0.009, dst2));
+
+
+        //Equivalence class: valid decimal places
+        BankAccount src3 = new BankAccount("a@b.com", 200);
+        BankAccount dst3 = new BankAccount("c@d.com", 100);
+        src3.transfer(50, dst3);                     // middle of class
+        assertEquals(150, src3.getBalance(), 0.001);
+        assertEquals(150, dst3.getBalance(), 0.001);
+
+        BankAccount src4 = new BankAccount("a@b.com", 200);
+        BankAccount dst4 = new BankAccount("c@d.com", 100);
+        src4.transfer(0.01, dst4);                   // smallest valid number
+        assertEquals(199.99, src4.getBalance(), 0.001);
+        assertEquals(100.01, dst4.getBalance(), 0.001);
+
+        BankAccount src5 = new BankAccount("a@b.com", 200);
+        BankAccount dst5 = new BankAccount("c@d.com", 100);
+        src5.transfer(200, dst5);                    // upper valid number
+        assertEquals(0, src5.getBalance(), 0.001);
+        assertEquals(300, dst5.getBalance(), 0.001);
+
+
+        //Equivalence class: no transfer
+        BankAccount src6 = new BankAccount("a@b.com", 200);
+        BankAccount dst6 = new BankAccount("c@d.com", 100);
+        src6.transfer(0, dst6);
+        assertEquals(200, src6.getBalance(), 0.001);
+        assertEquals(100, dst6.getBalance(), 0.001);
+
+        //Equivalence class: invalid funds
+        BankAccount src7 = new BankAccount("a@b.com", 200);
+        BankAccount dst7 = new BankAccount("c@d.com", 100);
+        assertThrows(InsufficientFundsException.class, () -> src7.transfer(200.01, dst7));
+
+        BankAccount src8 = new BankAccount("a@b.com", 200);
+        BankAccount dst8 = new BankAccount("c@d.com", 100);
+        assertThrows(InsufficientFundsException.class, () -> src8.transfer(500, dst8));
+
+        //Equivalence class: invalid destination
+        BankAccount src9 = new BankAccount("a@b.com", 200);
+        assertThrows(IllegalArgumentException.class, () -> src9.transfer(50, null));
     }
 
 }
